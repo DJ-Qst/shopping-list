@@ -8,18 +8,7 @@ Addbtnx = 210
 Addbtny = 30
 Entryx = 175
 Entryy = 25
-Items = []
-jsonfile = 'list.json'
-
-try:
-    with open(jsonfile) as f_obj:
-        try:
-            Items = json.load(f_obj)
-        except json.decoder.JSONDecodeError:
-            pass
-except FileNotFoundError:
-    with open(jsonfile, 'w') as f_obj:
-        print("Json file created")
+NumItems = 0
 
 # Initializes Mixer and Starts Background Music
 mixer.init()
@@ -28,20 +17,27 @@ mixer.music.play(loops=-1)
 
 # Sets up Window
 
-root.geometry('500x500')  # 210 is the center for some reason
+root.geometry('500x475')  # 210 is the center for some reason
 root.title("Shopping List")
 root.iconbitmap(r'listicon.ico')
+root.resizable(False, False)
 
 
 class ButtonAction():
     def AddItem():
         # Function that adds items
-        global Addbtny, Entryy
-        Addbtny += 20
-        Addbtn.place_forget()
-        Addbtn.place(x=Addbtnx, y=Addbtny)
-        Items.append(Entry(root).place(x=Entryx, y=Entryy))
-        Entryy += 20
+        global Addbtny, Entryy, NumItems
+        if NumItems < 20:
+            Addbtny += 20
+            Addbtn.place_forget()
+            Addbtn.place(x=Addbtnx, y=Addbtny)
+            Entry(root).place(x=Entryx, y=Entryy)
+            Entryy += 20
+            NumItems += 1
+        if NumItems >= 20:
+            Addbtn.place_forget()
+            stopimgb.place(x=Addbtnx, y=Addbtny)
+            print("I'm sorry, you are at the maximum number of items\n")
 
     def Pause():
         # Drops volue to zero "Pauses the music"
@@ -56,10 +52,6 @@ class ButtonAction():
         mixer.music.set_volume(1)
         ResumeSound.place_forget()
         PauseSound.place(x=10, y=10)
-
-    def save(self):
-        # Saves the data
-        with open(jsonfile)
 
 
 # Puts text at the top of the screen as a welcome message
@@ -79,6 +71,10 @@ ResumeSound = Button(root, image=WithoutSound, command=ButtonAction.Unpause, bor
 WithSound = PhotoImage(file='sound.png')
 PauseSound = Button(root, image=WithSound, command=ButtonAction.Pause, borderwidth=0)
 PauseSound.place(x=10, y=10)
+
+stopimg = PhotoImage(file='stop.png')
+stopimgb = Button(root, image=stopimg, command=ButtonAction.AddItem, borderwidth=0)
+
 
 # Loops everything in the window to keep it available
 root.mainloop()
